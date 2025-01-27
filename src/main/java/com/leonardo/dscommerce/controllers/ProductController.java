@@ -1,6 +1,7 @@
 package com.leonardo.dscommerce.controllers;
 
 import com.leonardo.dscommerce.DTO.ProductDTO;
+import com.leonardo.dscommerce.DTO.ProductMinDTO;
 import com.leonardo.dscommerce.entities.Product;
 import com.leonardo.dscommerce.repositories.ProductRepository;
 import com.leonardo.dscommerce.services.ProductService;
@@ -32,10 +33,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductDTO>> findAll(
+    public ResponseEntity<Page<ProductMinDTO>> findAll(
             @RequestParam(name = "name", defaultValue = "") String name,
             Pageable pageable){
-        Page<ProductDTO> dto = service.findAll(name, pageable);
+        Page<ProductMinDTO> dto = service.findAll(name, pageable);
         return ResponseEntity.ok().body(dto);
     }
 
