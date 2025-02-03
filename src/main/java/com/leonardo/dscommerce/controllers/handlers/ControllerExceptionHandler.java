@@ -3,6 +3,7 @@ package com.leonardo.dscommerce.controllers.handlers;
 import com.leonardo.dscommerce.DTO.CustomError;
 import com.leonardo.dscommerce.DTO.ValidationError;
 import com.leonardo.dscommerce.services.exceptions.DatabaseException;
+import com.leonardo.dscommerce.services.exceptions.ForbiddenException;
 import com.leonardo.dscommerce.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -40,4 +41,12 @@ public class ControllerExceptionHandler{
         }
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<CustomError> forbidden(ForbiddenException e, HttpServletRequest request){
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
 }
