@@ -2,9 +2,16 @@ package com.leonardo.dscommerce;
 
 import com.leonardo.dscommerce.DTO.CategoryDTO;
 import com.leonardo.dscommerce.DTO.ProductDTO;
-import com.leonardo.dscommerce.DTO.ProductMinDTO;
 import com.leonardo.dscommerce.entities.Category;
 import com.leonardo.dscommerce.entities.Product;
+import com.leonardo.dscommerce.entities.Role;
+import com.leonardo.dscommerce.entities.User;
+import com.leonardo.dscommerce.projections.UserDetailsProjection;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Factory {
 
@@ -47,6 +54,91 @@ public class Factory {
         dto.getCategories().add(category);
         return dto;
     }
-    
 
+    //User
+    public static User createClient(){
+        User user = new User(1L, "Alex", "alex@gmail.com", "(11) 94002-8922", LocalDate.parse("1999-12-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")), "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO");
+        user.addRoles(new Role(2L , "ROLE_OPERATOR"));
+        return user;
+    }
+
+    public static User createCustomClient(Long id, String name){
+        User user = new User(id, name, String.join(name,"@gmail.com"), "(11) 4002-8922", LocalDate.parse("1999-12-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")), "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO");
+        user.addRoles(new Role(2L , "ROLE_OPERATOR"));
+        return user;
+    }
+
+    public static User createAdmin(){
+        User user = new User(2L, "Maria", "maria@gmail.com", "(11) 92156-9875", LocalDate.parse("1985-03-12", DateTimeFormatter.ofPattern("yyyy-MM-dd")), "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO");
+        user.addRoles(new Role(1L , "ROLE_ADMIN"));
+        return user;
+    }
+
+    public static User createCustomAdmin(Long id, String name){
+        User user = new User(id, name, String.join(name,"@gmail.com"), "(11) 4002-8922", LocalDate.parse("1999-12-01", DateTimeFormatter.ofPattern("yyyy-MM-dd")), "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO");
+        user.addRoles(new Role(2L , "ROLE_ADMIN"));
+        return user;
+    }
+
+    //UserDetails
+    public static List<UserDetailsProjection> createCustomClientUserDetails(String usename){
+        List<UserDetailsProjection> list = new ArrayList<>();
+        list.add(new UserDetailsImpl(usename, "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO", 1L, "ROLE_OPERATOR"));
+        return list;
+    }
+
+    public static List<UserDetailsProjection> createCustomAdminUserDetails(String usename){
+        List<UserDetailsProjection> list = new ArrayList<>();
+        list.add(new UserDetailsImpl(usename, "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO", 2L, "ROLE_ADMIN"));
+        return list;
+    }
+
+    public static List<UserDetailsProjection> createCustomAdminClientUserDetails(String usename){
+        List<UserDetailsProjection> list = new ArrayList<>();
+        list.add(new UserDetailsImpl(usename, "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO", 1L, "ROLE_OPERATOR"));
+        list.add(new UserDetailsImpl(usename, "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO", 2L, "ROLE_ADMIN"));
+        return list;
+    }
 }
+
+/**
+ * Inner class responsible to implements Interface {@link UserDetailsProjection}
+ * and instantiate objects.
+ */
+class UserDetailsImpl implements UserDetailsProjection{
+
+    private String username;
+    private String password;
+    private Long roleId;
+    private String authority;
+
+    public UserDetailsImpl(){}
+
+    public UserDetailsImpl(String username, String password, Long roleId, String authority) {
+        this.username = username;
+        this.password = password;
+        this.roleId = roleId;
+        this.authority = authority;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    @Override
+    public String getAuthority() {
+        return authority;
+    }
+}
+

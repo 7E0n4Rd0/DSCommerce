@@ -1,6 +1,7 @@
 package com.leonardo.dscommerce.services;
 
 import com.leonardo.dscommerce.DTO.UserDTO;
+import com.leonardo.dscommerce.Util.CustomUserUtil;
 import com.leonardo.dscommerce.entities.Role;
 import com.leonardo.dscommerce.entities.User;
 import com.leonardo.dscommerce.projections.UserDetailsProjection;
@@ -24,6 +25,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository repository;
 
+    @Autowired
+    private CustomUserUtil userUtil;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<UserDetailsProjection> list = repository.searchUserAndRolesByEmail(username);
@@ -46,9 +50,7 @@ public class UserService implements UserDetailsService {
 
     protected User authenticated() {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-            String username = jwtPrincipal.getClaim("username");
+            String username = userUtil.getLoggedUsername();
             return repository.findByEmail(username).get();
         } catch (Exception e) {
             throw new UsernameNotFoundException("Email not found");
