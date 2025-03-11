@@ -105,8 +105,9 @@
 						<exclude>com/leonardo/dscommerce/config/**</exclude>
 						<exclude>com/leonardo/dscommerce/entities/**</exclude>
 						<exclude>com/leonardo/dscommerce/DTO/**</exclude>
-						<exclude>com/leonardo/dscommerce/controllers/handlers/**</exclude>
+						<exclude>com/leonardo/dscommerce/controllers/**</exclude>
 						<exclude>com/leonardo/dscommerce/services/exceptions/**</exclude>
+						<exclude>com/leonardo/dscommerce/Util/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>

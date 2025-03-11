@@ -2,12 +2,10 @@ package com.leonardo.dscommerce;
 
 import com.leonardo.dscommerce.DTO.CategoryDTO;
 import com.leonardo.dscommerce.DTO.ProductDTO;
-import com.leonardo.dscommerce.entities.Category;
-import com.leonardo.dscommerce.entities.Product;
-import com.leonardo.dscommerce.entities.Role;
-import com.leonardo.dscommerce.entities.User;
+import com.leonardo.dscommerce.entities.*;
 import com.leonardo.dscommerce.projections.UserDetailsProjection;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -99,6 +97,18 @@ public class Factory {
         list.add(new UserDetailsImpl(usename, "$2a$10$XZHsZ0yuw1IkMbwcTKQHiet8JQB3bAdV0KjcU9Bg6zAHbrAmOFlEO", 2L, "ROLE_ADMIN"));
         return list;
     }
+
+    //Order
+
+    public static Order createOrder(User client){
+        Order order = new Order(1L, Instant.now(), OrderStatus.WAITING_PAYMENT, client, new Payment());
+        Product product = Factory.createProduct();
+        OrderItem orderItem = new OrderItem(order, product, 1, 4500.00);
+        order.getItems().add(orderItem);
+
+        return order;
+    }
+
 }
 
 /**
