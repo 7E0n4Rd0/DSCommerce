@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -208,6 +209,45 @@ public class ProductControllerIT {
         result.andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
+    @Test
+    public void deleteShouldDeleteProductDtoWhenIdExistsAndAdminLogged() throws Exception{
+        Long id = 10L;
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id)
+                .header("Authorization", "Bearer " + adminToken));
+        result.andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExistsAndAdminLogged() throws Exception {
+        Long id = 100L;
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id)
+                .header("Authorization", "Bearer " + adminToken));
+        result.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void deleteShouldReturnBadRequestWhenIdIsDependentAndAdminLogged() throws Exception {
+        Long dependentId = 3L;
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", dependentId)
+                .header("Authorization", "Bearer " + adminToken));
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void deleteShouldReturnForbiddenWhenClientLogged() throws Exception {
+        Long id = 10L;
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id)
+                .header("Authorization", "Bearer " + clientToken));
+        result.andExpect(MockMvcResultMatchers.status().isForbidden());
+    }
+
+    @Test
+    public void deleteShouldReturnUnauthorizedWhenNoUserIsLogged() throws Exception {
+        Long id = 10L;
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id)
+                .header("Authorization", "Bearer " + invalidToken));
+        result.andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
 
 }
