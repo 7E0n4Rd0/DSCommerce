@@ -43,6 +43,12 @@ public class Factory {
         return product;
     }
 
+    public static Product createProduct(String name, String description, Double price, String imgUrl, Category category){
+        Product product = new Product(null, name, description, price, imgUrl);
+        product.getCategories().add(category);
+        return product;
+    }
+
     public static ProductDTO createProductDto(){
         return new ProductDTO(createProduct());
     }
