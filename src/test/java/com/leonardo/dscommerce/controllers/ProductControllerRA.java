@@ -15,13 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Transactional
 public class ProductControllerRA {
 
     private String clientUsername, clientPassword, adminUsername, adminPassword;
     private String clientToken, adminToken, invalidToken;
     private String productName;
-    private Long existingId, nonExistingId;
+    private Long existingId, nonExistingId, dependentId;
     private List<Map<String, Object>> categories;
 
     private Map<String, Object> postProductInstance;
@@ -41,6 +40,7 @@ public class ProductControllerRA {
         baseURI = "http://localhost:8080";
         existingId = 2L;
         nonExistingId = 50L;
+        dependentId = 1L;
         productName = "PC Gamer X";
 
         postProductInstance = new HashMap<>();
@@ -257,4 +257,52 @@ public class ProductControllerRA {
                 .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
+    @Test
+    public void deleteShouldReturnNoContentWhenAdminLogged(){
+        given()
+            .header("Authorization", "Bearer " + adminToken)
+            .delete("/products/{id}", existingId)
+        .then()
+            .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExistsAndAdminLogged(){
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + adminToken)
+            .delete("/products/{id}", nonExistingId)
+        .then()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void deleteShouldReturnBadRequestWhenIdIsDependentAndAdminLogged(){
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + adminToken)
+            .delete("/products/{id}", dependentId)
+        .then()
+            .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void deleteShouldReturnForbiddenWhenClientLogged(){
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + clientToken)
+            .delete("/products/{id}", existingId)
+        .then()
+            .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void deleteShouldReturnUnauthorizedWhenNoOneLogged(){
+        given()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + invalidToken)
+            .delete("/products/{id}", existingId)
+        .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
 }
