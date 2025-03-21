@@ -259,6 +259,7 @@ public class ProductControllerRA {
 
     @Test
     public void deleteShouldReturnNoContentWhenAdminLogged(){
+        existingId = 25L;
         given()
             .header("Authorization", "Bearer " + adminToken)
             .delete("/products/{id}", existingId)
