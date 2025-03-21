@@ -10,12 +10,10 @@ import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Transactional
 public class ProductControllerRA {
@@ -24,6 +22,7 @@ public class ProductControllerRA {
     private String clientToken, adminToken, invalidToken;
     private String productName;
     private Long existingId, nonExistingId;
+    private List<Map<String, Object>> categories;
 
     private Map<String, Object> postProductInstance;
 
@@ -55,7 +54,7 @@ public class ProductControllerRA {
         postProductInstance.put("imgUrl", "https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/26-big.jpg");
         postProductInstance.put("price", 50.0);
 
-        List<Map<String, Object>> categories = new ArrayList<>();
+        categories = new ArrayList<>();
         Map<String, Object> category1 = new HashMap<>();
         category1.put("id", 2);
         Map<String, Object> category2 = new HashMap<>();
@@ -129,6 +128,133 @@ public class ProductControllerRA {
             .body("price", is(50.0F))
             .body("imgUrl", equalTo("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/26-big.jpg"))
             .body("categories.id", hasItems(2, 3));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenNameIsInvalidAndAdminLogged(){
+        postProductInstance.put("name", "");
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .body("errors[0].fieldName", equalTo("name"))
+                .body("errors[0].message", equalTo("Name must be between three and eighty characters."));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenDescriptionIsInvalidAndAdminLogged(){
+        postProductInstance.put("description", "");
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .body("errors[0].fieldName", equalTo("description"))
+                .body("errors[0].message", equalTo("Description must have ten characters."));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenPriceIsNegativeAndAdminLogged(){
+        postProductInstance.put("price", -50.0);
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .body("errors[0].fieldName", equalTo("price"))
+                .body("errors[0].message", equalTo("The price must be positive"));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenPriceIsZeroAndAdminLogged(){
+        postProductInstance.put("price", 0.0);
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .body("errors[0].fieldName", equalTo("price"))
+                .body("errors[0].message", equalTo("The price must be positive"));
+    }
+
+    @Test
+    public void insertShouldReturnUnprocessableEntityWhenHasNoCategoryAndAdminLogged(){
+        postProductInstance.put("categories", List.of());
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + adminToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .body("errors[0].fieldName", equalTo("categories"))
+                .body("errors[0].message", equalTo("Must have one category"));
+    }
+
+    @Test
+    public void insertShouldReturnForbiddenWhenClientLogged(){
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + clientToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void insertShouldReturnUnauthorizedWhenNoOneLogged(){
+        JSONObject newProduct = new JSONObject(postProductInstance);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + invalidToken)
+                .body(newProduct)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+        .when()
+                .post("/products")
+        .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
 }
