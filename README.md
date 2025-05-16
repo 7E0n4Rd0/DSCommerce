@@ -23,6 +23,9 @@ login, controle de acesso, dentre outras.
 - JPQL
 - OAuth2
 - JWT
+- JUnit
+- Rest Assured
+- Jacoco
 
 ## Habilidades desenvolvidas
 
@@ -34,8 +37,10 @@ login, controle de acesso, dentre outras.
 - Tratamento de Exceções;
 - Validação com Bean Validation;
 - Consultas SQL e JPQL;
-- Implementação de segurança com OAuth2 e JWT.
+- Implementação de segurança com OAuth2 e JWT;
+- Implementação de Testes Automatizados com JUnit5 e Rest Assured;
+- Cobertura de Testes Automatizados com Jacoco.
 
 ## Autor
 
-[Leonardo](https://www.linkedin.com/in/leonardo-meireles-26b5b7338?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
+[Leonardo](https://www.linkedin.com/in/leonardo-meireles-26b5b7338)
